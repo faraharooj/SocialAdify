@@ -1,15 +1,11 @@
-# D:/socialadify/backend/check_gemini_models.py
-
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
 print("--- Checking available Gemini Models ---")
 
-# Load environment variables from .env file
 load_dotenv()
 
-# 1. Get the API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GEMINI_API_KEY:
@@ -18,16 +14,16 @@ if not GEMINI_API_KEY:
 else:
     print("\nAPI Key found. Configuring...")
     try:
-        # 2. Configure the library
+       
         genai.configure(api_key=GEMINI_API_KEY)
 
-        # 3. List the models
+       
         print("\nFetching models available to your API key...")
         print("-" * 30)
         
         found_models = False
         for m in genai.list_models():
-            # We only care about models that support the 'generateContent' method
+            
             if 'generateContent' in m.supported_generation_methods:
                 print(f"Model Name: {m.name}")
                 found_models = True
