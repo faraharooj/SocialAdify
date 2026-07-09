@@ -12,11 +12,9 @@ from app.services.scheduler_service import process_due_posts
 from app.db.session import connect_to_mongo, close_mongo_connection
 from app.core.config import CLIENT_HOST
 
-# --- CLEANUP: Standardized Router Imports ---
-# All routers are now imported using the same clear pattern.
 from app.api.auth.auth_router import router as auth_router
 from app.api.auth.google_auth_router import router as google_auth_router
-# --- NEW: Import your new Meta authentication router ---
+
 from app.api.auth.meta_auth_router import router as meta_auth_router
 
 from app.api.insights.router import router as insights_router
@@ -35,13 +33,12 @@ from app.api.ads.meta_router import router as meta_ads_router
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- (Static file path setup remains the same) ---
+
 MAIN_PY_DIR = Path(__file__).resolve().parent
 STATIC_FILES_DIR = MAIN_PY_DIR / "static"
 STATIC_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# --- (Lifespan function for startup/shutdown remains the same) ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application startup: Initializing resources...")
@@ -66,7 +63,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# --- (Static file mounting and CORS middleware remain the same) ---
+
 app.mount("/static", StaticFiles(directory=str(STATIC_FILES_DIR.resolve())), name="static")
 
 if CLIENT_HOST:
@@ -80,11 +77,9 @@ if CLIENT_HOST:
     )
 
 
-# --- API Routers ---
-# All routers are now included in a more organized and consistent way.
 app.include_router(auth_router, prefix="/auth", tags=["Core Authentication"])
 app.include_router(google_auth_router, prefix="/auth", tags=["Google Authentication"])
-# --- NEW: Include your new Meta authentication router under the /auth prefix ---
+
 app.include_router(meta_auth_router, prefix="/auth", tags=["Meta Authentication"])
 
 app.include_router(insights_router, prefix="/insights", tags=["Insights & Ad Analytics"])
@@ -101,7 +96,7 @@ app.include_router(ads_router, prefix="/ads", tags=["AI Ad Creation"])
 app.include_router(meta_ads_router, prefix="/ads/meta", tags=["Meta Ad Creation"])
 
 
-# --- (Root and health check endpoints remain the same) ---
+
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to the SocialAdify Backend API!"}
