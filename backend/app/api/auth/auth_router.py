@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.user import (
     UserCreate, UserPublic, Token, UserInDB, UserUpdate, 
     PasswordResetRequest, PasswordResetConfirm,
-    # --- NEW: Import the model for the change password endpoint ---
+
     PasswordChange, DeleteAccountRequest
 )
 from app.crud import user as user_service
@@ -30,7 +30,7 @@ DbDependency = Annotated[AsyncIOMotorDatabase, Depends(get_database)]
 CurrentUserDependency = Annotated[UserInDB, Depends(get_current_active_user)]
 
 
-# --- (Core auth endpoints remain unchanged) ---
+
 @router.post("/signup", response_model=UserPublic, status_code=status.HTTP_201_CREATED)
 async def signup_user(user_in: UserCreate, db: DbDependency):
     existing_user = await user_service.get_user_by_email(db, email=user_in.email.lower())
@@ -54,7 +54,7 @@ async def read_users_me(current_user: CurrentUserDependency):
     return UserPublic.from_user_in_db(current_user)
 
 
-# --- NEW: The Missing Change Password Endpoint ---
+
 @router.post("/users/me/change-password")
 async def change_current_user_password(
     password_data: PasswordChange,
@@ -64,12 +64,12 @@ async def change_current_user_password(
     """
     Allows an authenticated user to change their own password.
     """
-    # 1. Authenticate the user with their current password
+    
     user = await user_service.authenticate_user(db, email=current_user.email, password=password_data.current_password)
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect current password")
 
-    # 2. If authentication is successful, update to the new password
+   
     success = await user_service.update_user_password(db, user=current_user, new_password=password_data.new_password)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to update password.")
